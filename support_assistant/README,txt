@@ -1,0 +1,34 @@
+# Module 3 — Support Assistant (`/support_assistant`)
+
+## 1. RAG Architecture & Data Flow
+
+```text
+               +----------------------------------+
+               | Incoming Query via POST /ask     |
+               +----------------------------------+
+                                |
+                                v
+               +----------------------------------+
+               | Node 1: classify_intent          |
+               | (Keyword heuristic in Mock Mode) |
+               +----------------------------------+
+                                |
+             +------------------+------------------+
+             |                                     |
+   [policy_question]                       [general_question]
+             |                                     |
+             v                                     v
++-----------------------------+        +--------------------------+
+| Node 2: retrieve_and_answer |        | Node 3: direct_answer    |
+| - ChromaDB (all-MiniLM-L6)  |        | - Return canned string   |
+| - Top-3 Cosine Similarity   |        | - sources: []            |
+| - Mock / Real-LLM branch    |        | - confidence: 1.0        |
++-----------------------------+        +--------------------------+
+             |                                     |
+             +------------------+------------------+
+                                |
+                                v
+               +----------------------------------+
+               | Pydantic Validation & Formatting |
+               | {answer, sources, confidence}    |
+               +----------------------------------+
